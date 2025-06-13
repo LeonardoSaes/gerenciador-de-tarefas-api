@@ -1,5 +1,9 @@
 package leonardosaes.gerenciador_de_tarefas.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import leonardosaes.gerenciador_de_tarefas.domain.user.User;
@@ -19,6 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/tarefa")
+@Tag(name = "Tarefas", description = "Operações relacionadas às tarefas dos usuários")
 public class TaskController {
 
     @Autowired
@@ -27,6 +32,12 @@ public class TaskController {
     @Autowired
     public TaskRepository taskRepository;
 
+    @Operation(summary = "Cadastrar nova tarefa", description = "Cria uma nova tarefa associada ao usuário autenticado.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Tarefa criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro na validação da tarefa"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @PostMapping("/cadastrar")
     @Transactional // Garante que a operação ocorra dentro de uma transação Hibernate
     public ResponseEntity<Task> criaTarefa(@RequestBody @Valid Task task) {
@@ -39,7 +50,7 @@ public class TaskController {
 
         return new ResponseEntity<>(task, HttpStatus.CREATED);
     }
-
+    @Operation(summary = "Listar todas as tarefas", description = "Retorna todas as tarefas do usuário autenticado.")
     @GetMapping(value = "/listar")
     public ResponseEntity<List<Task>> listaTodasTarefas(@AuthenticationPrincipal UserDetails userDetails) {
         try {
@@ -56,7 +67,7 @@ public class TaskController {
         }
     }
 
-
+    @Operation(summary = "Atualizar tarefa", description = "Atualiza os dados de uma tarefa existente pelo ID.")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Task> atualizaTarefa(@PathVariable Long id, @RequestBody @Valid Task tarefaAtualizada){
         try{
@@ -67,6 +78,7 @@ public class TaskController {
         }
     }
 
+    @Operation(summary = "Deletar tarefa", description = "Remove uma tarefa pelo ID.")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deletaTarefa(@PathVariable Long id){
             try {
@@ -84,7 +96,7 @@ public class TaskController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // Retorna 500 em caso de erro
         }
     }
-
+    @Operation(summary = "Buscar tarefa por ID", description = "Retorna uma tarefa específica pelo seu ID.")
     @GetMapping(value = "/listar/{id}")
     public ResponseEntity<Task> buscaPorId(@PathVariable Long id){
         try{
@@ -99,6 +111,7 @@ public class TaskController {
         }
     }
 
+    @Operation(summary = "Buscar tarefas por título", description = "Busca todas as tarefas que contenham o título informado.")
     @GetMapping(value = "/buscar-por-titulo")
     public ResponseEntity<List<Task>> buscaPorTitulo(@RequestParam String titulo) {
 
@@ -113,7 +126,7 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
+    @Operation(summary = "Buscar tarefas por descrição", description = "Busca todas as tarefas que contenham a descrição informada.")
     @GetMapping(value = "/busca-por-descricao")
     public ResponseEntity<List<Task>> buscaPorDescricao(@RequestParam String descricao) {
         try {

@@ -38,6 +38,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.NEVER))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll() // Permite acesso ao H2 Console
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                         "/v3/api-docs/**",
+                                         "/swagger-resources/**",
+                                         "/webjars/**"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         // Permitir qualquer usuário autenticado criar tarefa
